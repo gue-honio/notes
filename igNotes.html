@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Notes Tracker</title>
+    <script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-database.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Instagram Notes Tracker</h1>
+        <form id="noteForm">
+            <div class="form-group">
+                <label for="username">Enter Username:</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+                <label for="noteText">Note Text:</label>
+                <input type="text" id="noteText" placeholder="Enter note text">
+            </div>
+            <div class="form-group">
+                <label for="song">Song Name (if applicable):</label>
+                <input type="text" id="song" placeholder="Enter song name">
+            </div>
+            <div class="form-group">
+                <label for="video">Video Link (if applicable):</label>
+                <input type="text" id="video" placeholder="Enter video link">
+            </div>
+            <button type="submit">Save Note</button>
+        </form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-firestore.js"></script>
+
+    <script>
+        const firebaseConfig = {
+  apiKey: "AIzaSyCHEh2R0dsrtXKoi66z_2ffmaJwfq9jhc4",
+  authDomain: "ignotes-a49a7.firebaseapp.com",
+  databaseURL: "https://ignotes-a49a7-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ignotes-a49a7",
+  storageBucket: "ignotes-a49a7.firebasestorage.app",
+  messagingSenderId: "1070351526503",
+  appId: "1:1070351526503:web:a9511e0c22ee32b3b902c2",
+  measurementId: "G-NQ8T82JLV5"
+};
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        // Function to save Aira's Instagram note
+        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const noteText = document.getElementById('noteText').value || "none";
+            const song = document.getElementById('song').value || "none";
+            const video = document.getElementById('video').value || "none";
+
+            if (!username) {
+                alert("Please enter a username!");
+                return;
+            }
+
+            const noteData = {
+                text: noteText,
+                song: song,
+                video: video
+            };
+
+            try {
+                const userRef = db.collection('usernames').doc(username);
+                const notesRef = userRef.collection('notes');
+                
+                // Check if the username already exists in the database
+                const userDoc = await userRef.get();
+                if (!userDoc.exists) {
+                    await userRef.set({}); // Create new user node if it doesn't exist
+                }
+
+                // Add the new note to the "notes" collection of the user
+                await notesRef.add(noteData);
+                alert("Note saved successfully!");
+            } catch (error) {
+                console.error("Error saving note: ", error);
+                alert("Error saving note.");
+            }
+        });
+    </script>
+</body>
+</html>
